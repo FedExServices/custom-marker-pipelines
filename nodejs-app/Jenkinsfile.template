@@ -5,20 +5,20 @@ pipeline {
 	   agent { label 'nodejs-app' }
 		 steps {
 			container('nodejs') {
-						   echo 'Hello World!'   
-						   sh 'node --version'
+				echo 'Hello World!'   
+				sh 'node --version'
 			}
 		 }
 		}
 		stage('Build and Push Image') {
 			agent any
 			 when {
-							beforeAgent true
-							branch 'master'
+				beforeAgent true
+				branch 'master'
 			 }
 			 steps {
-							echo "TODO - build and push image"
-							unstash 'app'
+				echo "TODO - build and push image"
+				unstash 'app'
 			 }                             
 		} 
 		stage('Deploy') {
