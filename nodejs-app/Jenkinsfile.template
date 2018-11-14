@@ -11,12 +11,14 @@ pipeline {
                                              }
                               }
                               stage('Build and Push Image') {
+                                            agent any
                                              when {
                                                             beforeAgent true
                                                             branch 'master'
                                              }
                                              steps {
                                                             echo "TODO - build and push image"
+                                                            unstash 'app'
                                              }                             
                               } 
                                   stage('Deploy') {
@@ -44,6 +46,15 @@ pipeline {
       steps {
         echo "Continuing with deployment - approved by ${APPROVER}"
       }
+      post {
+        success {
+          stash name: 'app', includes: '*.js, public/**, views/*, Dockerfile'
+        }
+      }
+       post {
+        success {
+          slackSend "${JOB_NAME} pipeline job is awaiting approval at: ${RUN_DISPLAY_URL}"
+        }
     }
     }
 }
