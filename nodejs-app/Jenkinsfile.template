@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'nodejs-app' }
+    agent none
     options { 
     buildDiscarder(logRotator(numToKeepStr: '2'))
   }
@@ -19,7 +19,9 @@ stage('Build and Push Image') {
          beforeAgent true
          branch 'master'
       }
+      agent { label 'nodejs-app' }
       steps {
          echo "TODO - build and push image"
+         sh 'java -version'
       }
 }
