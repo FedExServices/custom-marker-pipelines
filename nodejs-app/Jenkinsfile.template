@@ -40,7 +40,6 @@
   }
       input {
         message "Should we deploy?"
-        submitter "Cratylus"
         submitterParameter "APPROVER"
       }
       steps {
