@@ -28,6 +28,16 @@
        options {
         timeout(time: 60, unit: 'SECONDS') 
       }
+      pipeline {
+         agent { label 'nodejs-app' }
+              options { 
+                        buildDiscarder(logRotator(numToKeepStr: '2'))
+     }
+  post {
+    aborted {
+      echo "Why didn't you push my button?"
+    }
+  }
       input {
         message "Should we deploy?"
         submitter "Cratylus"
