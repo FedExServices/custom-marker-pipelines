@@ -1,49 +1,62 @@
 pipeline {
-               agent none
-               stages {
-                              stage('Test') {
-                              agent { label 'nodejs-app' }
-                                             steps {
-                                                            container('nodejs') {
-                                                                           echo 'Hello World!'   
-                                                                           sh 'node --version'
-                                                            }
-                                             }
-                              }
-                              stage('Build and Push Image') {
-                                             when {
-                                                            beforeAgent true
-                                                            branch 'master'
-                                             }
-                                             steps {
-                                                            echo "TODO - build and push image"
-                                             }                             
-                              } 
-                                  stage('Deploy') {
-      when {
-        beforeAgent true
-        branch 'master'
-      }
-       options {
-        timeout(time: 60, unit: 'SECONDS') 
-      }
-      pipeline {
-         agent { label 'nodejs-app' }
-              options { 
+   agent none
+   stages {
+	   stage('Test') {
+	   agent { label 'nodejs-app' }
+		 steps {
+			container('nodejs') {
+						   echo 'Hello World!'   
+						   sh 'node --version'
+			}
+		 }
+		}
+		stage('Build and Push Image') {
+			agent any
+			 when {
+							beforeAgent true
+							branch 'master'
+			 }
+			 steps {
+							echo "TODO - build and push image"
+							unstash 'app'
+			 }                             
+		} 
+		stage('Deploy') {
+			when {
+				beforeAgent true
+				branch 'master'
+			}
+		}
+        options {
+			timeout(time: 60, unit: 'SECONDS') 
+		}
+		pipeline {
+				agent { label 'nodejs-app' }
+				options { 
                         buildDiscarder(logRotator(numToKeepStr: '2'))
-     }
-  post {
-    aborted {
-      echo "Why didn't you push my button?"
-    }
-  }
-      input {
-        message "Should we deploy?"
-        submitterParameter "APPROVER"
-      }
-      steps {
-        echo "Continuing with deployment - approved by ${APPROVER}"
-      }
+				}
+				post {
+					aborted {
+					echo "Why didn't you push my button?"
+				}
+				}
+		}
+		input {
+			message "Should we deploy?"
+			submitterParameter "APPROVER"
+		}
+		steps {
+			echo "Continuing with deployment - approved by ${APPROVER}"
+		}
+		post {
+			success {
+			stash name: 'app', includes: '*.js, public/**, views/*, Dockerfile'
+			}
+		}
+		post {
+			success {
+			slackSend "${JOB_NAME} pipeline job is awaiting approval at: ${RUN_DISPLAY_URL}"
+        }
     }
     }
 }
